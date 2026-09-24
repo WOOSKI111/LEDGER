@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Invoices · Ledger{% endblock %}
+{% block content %}
+
+<h2 style="margin-bottom:14px;">Invoices</h2>
+
+<form class="filter-bar" method="get">
+  <select name="status" onchange="this.form.submit()">
+    <option value="" {{ 'selected' if not status }}>All statuses</option>
+    <option value="unpaid" {{ 'selected' if status=='unpaid' }}>Unpaid</option>
+    <option value="paid" {{ 'selected' if status=='paid' }}>Paid</option>
+  </select>
+  <input type="text" name="supplier" placeholder="Filter by supplier" value="{{ supplier }}">
+  <a href="{{ url_for('export') }}" class="btn btn-sm btn-outline">⬇ Export Excel</a>
+</form>
+
+{% if invoices %}
+  {% for inv in invoices %}
+  <div class="invoice-card {{ 'paid' if inv.paid else 'unpaid' }}" id="inv-{{ inv.id }}">
+    <div class="invoice-top">
+      <div>
+        <div class="invoice-supplier">{{ inv.supplier }}</div>
+        <div class="invoice-meta">{{ inv.invoice_number or 'No invoice #' }} · {{ inv.invoice_date or 'no date' }}{% if inv.due_date %} · due {{ inv.due_date }}{% endif %}</div>
+        <span class="status-pill {{ 'paid' if inv.paid else 'unpaid' }}">{{ 'Paid' if inv.paid else 'Unpaid' }}</span>
+      </div>
+      <div class="invoice-amt mono">${{ "%.2f"|format(inv.total_cost or 0) }}</div>
+    </div>
+    <div class="invoice-items">
+      {% for item in inv.items %}
+        {{ item.part_name }}{% if item.part_number %} ({{ item.part_number }}){% endif %} — ${{ "%.2f"|format(item.cost or 0) }}{% if item.fits %} · fits {{ item.fits }}{% endif %}<br>
+      {% endfor %}
+    </div>
+    <div class="invoice-actions">
+      {% if inv.paid %}
+        <button class="btn btn-sm btn-outline" onclick="togglePaid({{ inv.id }}, false)">Mark Unpaid</button>
+      {% else %}
+        <button class="btn btn-sm btn-green" onclick="togglePaid({{ inv.id }}, true)">Mark Paid</button>
+      {% endif %}
+      <button class="btn btn-sm btn-danger" onclick="deleteInvoice({{ inv.id }})">Delete</button>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="empty">No invoices match this filter.</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function togglePaid(id, paid) {
+  fetch(`/invoice/${id}/paid`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ paid }),
+  }).then(() => window.location.reload());
+}
+function deleteInvoice(id) {
+  if (!confirm('Delete this invoice and all its line items?')) return;
+  fetch(`/invoice/${id}/delete`, { method: 'POST' }).then(() => window.location.reload());
+}
+</script>
+{% endblock %}

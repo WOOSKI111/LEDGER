@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>{% block title %}Ledger{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a href="{{ url_for('index') }}" class="brand">
+      <span class="brand-mark">LEDGER</span>
+    </a>
+    <nav class="topnav">
+      <a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint=='index' else '' }}">Dashboard</a>
+      <a href="{{ url_for('invoices') }}" class="{{ 'active' if request.endpoint=='invoices' else '' }}">Invoices</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+
+  <a href="{{ url_for('index') }}#scan" class="fab" id="scanFab" aria-label="Scan invoice">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></svg>
+  </a>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>
