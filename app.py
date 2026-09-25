@@ -166,6 +166,16 @@ def _autofit(ws, headers):
     for i, header in enumerate(headers, 1):
         ws.column_dimensions[get_column_letter(i)].width = max(14, len(header) + 4)
 
+@app.route("/debug")
+def debug():
+    import os
+    templates_path = os.path.join(app.root_path, "templates")
+    return {
+        "root_path": app.root_path,
+        "root_listing": os.listdir(app.root_path),
+        "templates_exists": os.path.isdir(templates_path),
+        "templates_listing": os.listdir(templates_path) if os.path.isdir(templates_path) else "MISSING",
+    }
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=False)
