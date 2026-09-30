@@ -26,7 +26,7 @@
       <div class="invoice-amt mono">${{ "%.2f"|format(inv.total_cost or 0) }}</div>
     </div>
     <div class="invoice-items">
-      {% for item in inv.items %}
+       {% for item in inv['items'] %}
         {{ item.part_name }}{% if item.part_number %} ({{ item.part_number }}){% endif %} — ${{ "%.2f"|format(item.cost or 0) }}{% if item.fits %} · fits {{ item.fits }}{% endif %}<br>
       {% endfor %}
     </div>
